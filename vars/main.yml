@@ -18,6 +18,9 @@
  openvpn_protocol: "udp"
  # It assume that the subnet mask is /24
  openvpn_network: "10.8.0.0" 
+ # dnsmasq listens for DHCP and DNS requests only on
+ # specified addresses (remember to include 127.0.0.1 if you use this.)
+ dnsmasq_listen_address: "127.0.0.1,10.8.0.1"
  # Private Subnet(s) in VPC that you want to reach through OPENVPN, it assume that the subnet mask is /24
  private_networks:
    - 10.10.20.0 255.255.255.0

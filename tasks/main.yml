@@ -80,7 +80,7 @@
             chdir={{ openvpn_path }}/{{ item }}
    with_items: 
      openvpn_clients
-           
+
  - name: Generate the HMAC firewall key
    command: openvpn --genkey --secret {{ openvpn_hmac_firewall }} creates={{ openvpn_hmac_firewall }}
 

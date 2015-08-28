@@ -7,7 +7,7 @@ cert server.crt
 key server.key  # This file should be kept secret
 dh dh{{ openvpn_key_size }}.pem
 #VPN subnet for OpenVPN to draw client addresses from.
-server 10.8.0.0 255.255.255.0
+server {{ openvpn_network }} 255.255.255.0
 ifconfig-pool-persist ipp.txt
 
 #Push routes to the client to allow it to reach other 
@@ -22,8 +22,6 @@ push "route {{ net }}"
 ;push "redirect-gateway def1 bypass-dhcp"
 ;push "redirect-gateway def1"
 
-# For name resolution
-;push "dhcp-option DNS 10.8.0.1"
 client-to-client
 keepalive 10 120
 tls-auth ta.key 0 # This file is secret
@@ -34,5 +32,5 @@ user nobody
 group nogroup
 persist-key
 persist-tun
-status openvpn-status.log
+status /var/log/openvpn-status.log
 verb 3
