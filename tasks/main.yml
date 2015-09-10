@@ -68,7 +68,7 @@
 
  - name: Create blank database file that will be used when generating the Server certificate
    file: path={{ openvpn_path }}/index.txt state=touch
-   when: openvpn_install and index_exist.stat.exists == False
+   when: openvpn_install == True and index_exist.stat.exists == False
    tags: openvpn
 
  - name: Check that the "serial" file exist
@@ -79,7 +79,7 @@
 
  - name: Copy/Create the serial file that will be used when generating the Server certificate
    copy: content="01" dest={{ openvpn_path }}/serial
-   when: openvpn_install and stat_result.stat.exists == False
+   when: openvpn_install == True and stat_result.stat.exists == False
    tags: openvpn
 
  - name: Generate the CSR for the Server
@@ -174,13 +174,13 @@
      - /sbin/iptables -A FORWARD -s {{ openvpn_network }}/24 -j ACCEPT
      - /sbin/iptables -A FORWARD -j REJECT
      - /sbin/iptables -t nat -A POSTROUTING -s {{ openvpn_network }}/24 -o {{ ansible_default_ipv4.interface }} -j MASQUERADE
-   when: openvpn_install and iptables_nat_rules.stdout.find("MASQUERADE") == -1
+   when: openvpn_install == True and iptables_nat_rules.stdout.find("MASQUERADE") == -1
    register: iptables_nat_rule_added
    tags: openvpn
 
  - name: Save NAT iptables rules
    command: service iptables-persistent save
-   when: openvpn_install and iptables_nat_rule_added.changed
+   when: openvpn_install == True and iptables_nat_rule_added.changed
    tags: openvpn
 
  - name: Allow OpenVPN through ufw
@@ -214,7 +214,7 @@
 
  - name: Retrieve the files that clients will need in order to connect to the OpenVPN server
    no_log: True
-   fetch: src={{ openvpn_path }}/{{ item[0] }}/{{ item[1] }} dest=clients/{{ item[0] }}.ovpn flat=yes
+   fetch: src={{ openvpn_path }}/{{ item[0] }}/{{ item[1] }} dest=clients/{{ openvpn_server }}-{{ item[0] }}.ovpn flat=yes
    with_nested:
      - openvpn_clients
      - ["{{ openvpn_server }}.ovpn"]
