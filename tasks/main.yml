@@ -30,16 +30,14 @@
 
  - name: Create directories for clients
    file: path={{ openvpn_path}}/{{ item }} state=directory
-   with_items: 
-     openvpn_clients
+   with_items: "{{ openvpn_clients }}"
    when: openvpn_install|bool
    tags: openvpn
 
  - name: Generate RSA keys for the Clients
    command: openssl genrsa -out {{ item }}.key {{ openvpn_key_size }} creates={{ item }}.key
             chdir={{ openvpn_path }}/{{ item }}
-   with_items:
-     openvpn_clients
+   with_items: "{{ openvpn_clients }}"
    when: openvpn_install|bool
    tags: openvpn
 
@@ -98,8 +96,7 @@
    command: >
      openssl req -new -key {{ item }}.key -out {{ item }}.csr -subj "{{ openssl_request_subject }}/CN={{ item }}" creates={{ item }}.csr
             chdir={{ openvpn_path }}/{{ item }}
-   with_items: 
-     openvpn_clients
+   with_items: "{{ openvpn_clients }}"
    when: openvpn_install|bool
    tags: openvpn
 
@@ -108,8 +105,7 @@
      openssl x509 -CA {{ openvpn_ca }}.crt -CAkey {{ openvpn_ca }}.key -CAcreateserial -req -days {{ openvpn_days_valid }} -in {{ item }}.csr -out {{ item }}.crt 
      creates={{ item }}.crt
             chdir={{ openvpn_path }}/{{ item }}
-   with_items: 
-     openvpn_clients
+   with_items: "{{ openvpn_clients }}"
    when: openvpn_install|bool
    tags: openvpn
 
@@ -126,14 +122,14 @@
 
  - name: Register client certificate contents
    command: cat {{ item }}.crt chdir={{ openvpn_path }}/{{ item }}
-   with_items: openvpn_clients
+   with_items: "{{ openvpn_clients }}"
    register: openvpn_client_certificates
    when: openvpn_install|bool
    tags: openvpn
 
  - name: Register client key contents
    command: cat {{ item }}.key chdir={{ openvpn_path }}/{{ item }}
-   with_items: openvpn_clients
+   with_items: "{{ openvpn_clients }}"
    register: openvpn_client_keys
    when: openvpn_install|bool
    tags: openvpn
